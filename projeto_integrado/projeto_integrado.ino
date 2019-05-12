@@ -14,6 +14,7 @@ int buttons_pins[NUMBER_OF_BUTTONS];
 int buttons_state[NUMBER_OF_BUTTONS];
 float frequency_multipliers[NUMBER_OF_BUTTONS];
 float frequency_values[NUMBER_OF_BUTTONS];
+
 float base_frequency = 880;
 
 Oscil<2048, AUDIO_RATE> osc[NUMBER_OF_BUTTONS];
@@ -36,6 +37,7 @@ void updateControl(){
 void loop(){
     audioHook();
 }
+
 
 int updateAudio(){
   outputSample = 0;
