@@ -1,11 +1,9 @@
 #include <MozziGuts.h>
 #include <Oscil.h>
 #include <tables/sin2048_int8.h>
-
 #include "pinout.h"
 
-#define CONTROL_RATE 128
-
+#define CONTROL_RATE            128
 #define DEBUG                   1
 #define NUMBER_OF_BUTTONS       6
 #define KEY_ACTIVE              LOW
@@ -18,8 +16,6 @@ float frequency_values[NUMBER_OF_BUTTONS];
 float base_frequency = 880;
 
 Oscil<2048, AUDIO_RATE> osc[NUMBER_OF_BUTTONS];
-
-float outputSample = 0;
 
 void setup() {
   #if DEBUG
@@ -35,55 +31,31 @@ void updateControl(){
 }
 
 void loop(){
-    audioHook();
+  audioHook();
 }
 
-
+// updateAudio:
+// Returns sound played, considering polyphonic tunes.
+// Since for loop screws with computational time, the best choice is to sum all the values, multiplied by their button state (1 or 0);
+// Bitwise operation used for fast division in order to decrease output saturation.
 int updateAudio(){
-  outputSample = 0;
-  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
-    if (buttons_state[i] == KEY_ACTIVE) {
-        Serial.println("entrou no if do update audio");
-      outputSample += osc[i].next();
-    } else {
-      Serial.println("nao entrou no if do update audio");
-  }
-  }
-  
-
- #if DEBUG
-  Serial.print("Amplitude na saida:");
-  Serial.print(" ");
-  Serial.println(outputSample);
- #endif
-  
-  return (int) (outputSample)>>3;
+  return ( buttons_state[0] * osc[0].next() + buttons_state[1] * osc[1].next() +
+  buttons_state[2] * osc[2].next() + buttons_state[3] *osc[3].next() +
+  buttons_state[4]*osc[4].next() + buttons_state[5]*osc[5].next()) >> 2;
 }
 
 void updateButtons() {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
     if (digitalRead(buttons_pins[i]) == KEY_ACTIVE) {
-      buttons_state[i] = KEY_ACTIVE;
-  }
-    else {
+      // 1 -> Button pressed, 0 otherwise
       buttons_state[i] = !KEY_ACTIVE;
-    }
+  }
+    else
+      buttons_state[i] = KEY_ACTIVE;
   }
 }
 
-//  #if DEBUG
-//
-//  Serial.print("Estado dos botoes:");
-//  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
-//    Serial.print(" ");
-//    Serial.print(buttons_state[i]);
-//  }
-//  Serial.println();
-//  #endif
-
-
 void initialize() {
-
   buttons_pins[0] = KEY_0_PIN;
   buttons_pins[1] = KEY_1_PIN;
   buttons_pins[2] = KEY_2_PIN;
@@ -94,11 +66,11 @@ void initialize() {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
     pinMode(buttons_pins[i], INPUT);
     
-    buttons_state[i] = !KEY_ACTIVE;
+    buttons_state[i] = KEY_ACTIVE;
 
     frequency_multipliers[i] = pow(2, i/12.0);
     frequency_values[i] = base_frequency * frequency_multipliers[i];
     osc[i].setTable(SIN2048_DATA);
-    osc[i].setFreq(frequency_values[i]); 
+    osc[i].setFreq(frequency_values[i]);
   }
 }
