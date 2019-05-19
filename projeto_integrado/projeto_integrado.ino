@@ -25,7 +25,7 @@ void setup() {
   #if DEBUG
   Serial.begin(9600);
   #endif
-  Serial.begin(9600);
+  
   initialize();
   startMozzi(CONTROL_RATE); 
 }
@@ -43,14 +43,18 @@ int updateAudio(){
   outputSample = 0;
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
     if (buttons_state[i] == KEY_ACTIVE) {
+        Serial.println("entrou no if do update audio");
       outputSample += osc[i].next();
-    }
+    } else {
+      Serial.println("nao entrou no if do update audio");
   }
+  }
+  
 
  #if DEBUG
   Serial.print("Amplitude na saida:");
   Serial.print(" ");
-  Serial.print((int) (outputSample)>>3);
+  Serial.println(outputSample);
  #endif
   
   return (int) (outputSample)>>3;
@@ -58,22 +62,25 @@ int updateAudio(){
 
 void updateButtons() {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
-    if (digitalRead(buttons_pins[i]) == KEY_ACTIVE)
+    if (digitalRead(buttons_pins[i]) == KEY_ACTIVE) {
       buttons_state[i] = KEY_ACTIVE;
-    else
-      buttons_state[i] = !KEY_ACTIVE;      
   }
-
-  #if DEBUG
-
-  Serial.print("Estado dos botoes:");
-  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
-    Serial.print(" ");
-    Serial.print(buttons_state[i]);
+    else {
+      buttons_state[i] = !KEY_ACTIVE;
+    }
   }
-  Serial.println();
-  #endif
 }
+
+//  #if DEBUG
+//
+//  Serial.print("Estado dos botoes:");
+//  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+//    Serial.print(" ");
+//    Serial.print(buttons_state[i]);
+//  }
+//  Serial.println();
+//  #endif
+
 
 void initialize() {
 
