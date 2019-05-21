@@ -14,7 +14,7 @@
 #define KEY_7_PIN       11
 #define KEY_8_PIN       12
 #define KEY_9_PIN       13
-#define KEY_10_PIN      14
-#define KEY_11_PIN      15
+#define KEY_10_PIN      2
+#define KEY_11_PIN      14
 
 #endif
