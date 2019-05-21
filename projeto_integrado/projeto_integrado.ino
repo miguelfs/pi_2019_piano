@@ -7,12 +7,12 @@
 #include "pinout.h"
 
 #define CONTROL_RATE            128
-#define DEBUG                   1
+#define DEBUG                   0
 #define NUMBER_OF_BUTTONS       12
 #define KEY_ACTIVE              LOW
 
 int buttons_pins[NUMBER_OF_BUTTONS];
-int buttons_state[NUMBER_OF_BUTTONS];
+//int buttons_state[NUMBER_OF_BUTTONS];
 float frequency_multipliers[NUMBER_OF_BUTTONS];
 float frequency_values[NUMBER_OF_BUTTONS];
 
@@ -49,18 +49,18 @@ void loop(){
 // Bitwise operation used for fast division in order to decrease output saturation.
 int updateAudio(){
   return( (long) envelope[0].next() * osc[0].next()
- //               + envelope[1].next() * osc[1].next()
- //               + envelope[2].next() * osc[2].next() 
-//                + envelope[3].next() * osc[3].next() 
- //             + envelope[4].next() * osc[4].next() 
-             // + envelope[5].next() * osc[5].next()
+                + envelope[1].next() * osc[1].next()
+                + envelope[2].next() * osc[2].next() 
+                + envelope[3].next() * osc[3].next() 
+                + envelope[4].next() * osc[4].next() 
+                + envelope[5].next() * osc[5].next()
                 + envelope[6].next() * osc[6].next()
                 + envelope[7].next() * osc[7].next() 
-//                + envelope[8].next() * osc[8].next() 
- //               + envelope[9].next() * osc[9].next()
+                + envelope[8].next() * osc[8].next() 
+                + envelope[9].next() * osc[9].next()
                 + envelope[10].next() * osc[10].next() 
-    //            + envelope[11].next() * osc[11].next() 
-                ) >> 9;
+                + envelope[11].next() * osc[11].next() 
+                ) >> 10;
 }
 
 void updateButtons() {
@@ -69,20 +69,34 @@ void updateButtons() {
   Serial.print("Estado dos botoes: ");
   #endif
   
-  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+  int howManyButtonsArePressed = 0;
+  
+  for (int i = 0; i < NUMBER_OF_BUTTONS-1; i++) {
+    
     if (digitalRead(buttons_pins[i]) == KEY_ACTIVE) {
       
-      buttons_state[i] = !KEY_ACTIVE;
-  
+      if (howManyButtonsArePressed > 2) {
+        envelope[i].noteOff();
+        howManyButtonsArePressed--;
+      }
+      else {
+        envelope[i].noteOn();
+        howManyButtonsArePressed++;
+      }
     }
-    else
-      buttons_state[i] = KEY_ACTIVE;
+
+    
+    
     #if DEBUG
     Serial.print(" ");
     Serial.print(buttons_state[i]);
     #endif
     
   }
+  
+  if (analogRead(buttons_pins[11]) < 10) {
+      envelope[11].noteOn();
+    }
 
   #if DEBUG
   Serial.println();
@@ -102,6 +116,20 @@ void initialize() {
   buttons_pins[9]  = KEY_9_PIN;
   buttons_pins[10] = KEY_10_PIN;
   buttons_pins[11] = KEY_11_PIN;
+
+  frequency_values[0] = 523.2;
+  frequency_values[1] = 555.9;
+  frequency_values[2] = 588.6;
+  frequency_values[3] = 621.3;
+  frequency_values[4] = 654;
+  frequency_values[5] = 686.7;
+  frequency_values[6] = 719.4;
+  frequency_values[7] = 784.8;
+  frequency_values[8] = 817.5;
+  frequency_values[9] = 850.2;
+  frequency_values[10] = 915.6;
+  frequency_values[11] = 981;  
+  
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
      envelope[i].setTimes(70,200,400,300);
      envelope[i].setADLevels(255,128);
@@ -111,24 +139,9 @@ void initialize() {
   
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
     pinMode(buttons_pins[i], INPUT);
-    
-    buttons_state[i] = KEY_ACTIVE;
 
     //frequency_multipliers[i] = pow(2, i/12.0);
     //frequency_values[i] = base_frequency * frequency_multipliers[i];
-    
-    frequency_values[0] = 261.63;
-    frequency_values[1] = 272.54;
-    frequency_values[2] = 294.33;
-    frequency_values[3] = 313.96;
-    frequency_values[4] = 327.03;
-    frequency_values[5] = 348.83;
-    frequency_values[6] = 367.92;
-    frequency_values[7] = 392.44;
-    frequency_values[8] = 418.60;
-    frequency_values[9] = 436.05;
-    frequency_values[10] = 470.93;
-    frequency_values[11] = 490.55;
     
     osc[i].setTable(SIN2048_DATA);
     osc[i].setFreq(frequency_values[i]);
