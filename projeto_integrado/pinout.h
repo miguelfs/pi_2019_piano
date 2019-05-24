@@ -11,11 +11,11 @@
 #define KEY_4_PIN       6
 #define KEY_5_PIN       7
 #define KEY_6_PIN       8
-#define KEY_7_PIN       15
+#define KEY_7_PIN       10
 #define KEY_8_PIN       11
 #define KEY_9_PIN       12
-#define KEY_10_PIN      13
-#define KEY_11_PIN      14
+#define KEY_10_PIN      14
+#define KEY_11_PIN      15
 
 
 #endif
