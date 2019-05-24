@@ -3,7 +3,8 @@
 #include <ADSR.h>
 #include <tables/sin2048_int8.h>
 #include "pinout.h"
-#define CONTROL_RATE 128
+#define CONTROL_RATE 64
+#define AUDIO_RATE 4096
 
 #define DEBUG                   0
 #define NUMBER_OF_BUTTONS       12
@@ -16,7 +17,7 @@ float frequency_values[NUMBER_OF_BUTTONS];
 Oscil<2048, AUDIO_RATE> osc[NUMBER_OF_BUTTONS];
 ADSR <CONTROL_RATE, AUDIO_RATE> envelope[NUMBER_OF_BUTTONS];
 
-float base_frequency = 880;
+float base_frequency = 440;
 
 void setup() {
 #if DEBUG
