@@ -5,7 +5,7 @@
 #include "pinout.h"
 #define CONTROL_RATE 64
 #define AUDIO_RATE 4096
-
+//comentario_besta
 #define DEBUG                   0
 #define NUMBER_OF_BUTTONS       12
 #define KEY_PRESSED             HIGH
